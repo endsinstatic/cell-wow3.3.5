@@ -61,6 +61,10 @@ Check <https://github.com/enderneko/Cell/tree/master/.snippets> for more snippet
 
 ## Changelog
 
+### r274-335d
+- Fixed menu fade out — use simple Show/Hide on 3.3.5a (animation system unreliable)
+- Fixed hoverFrame not detecting mouse (`EnableMouse(true)` required on 3.3.5a)
+
 ### r274-335c
 - Fixed heal prediction not showing on any party frames (`CallMethod` broken on 3.3.5a, `party.units` table was empty)
 - Added `/cell debug heals` and `/cell debug buttons` diagnostic commands

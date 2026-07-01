@@ -35,6 +35,7 @@ local cellMainFrame = CreateFrame("Frame", "CellMainFrame", CellParent, "SecureF
 Cell.frames.mainFrame = cellMainFrame
 
 local hoverFrame = CreateFrame("Frame", "CellMenuHoverDetector", cellMainFrame)
+hoverFrame:EnableMouse(true)
 -- Cell.StylizeFrame(hoverFrame, {1,0,0,0.3}, {0,0,0,0})
 
 local anchorFrame = CreateFrame("Frame", "CellAnchorFrame", cellMainFrame)
@@ -204,6 +205,7 @@ menuFrame.fadeIn.alpha:SetDuration(0.5)
 if menuFrame.fadeIn.alpha.SetSmoothing then menuFrame.fadeIn.alpha:SetSmoothing("OUT") end
 menuFrame.fadeIn:SetScript("OnPlay", function()
     menuFrame.fadeOut:Finish()
+    menuFrame:Show()
     fadingIn = true
 
     if Cell.frames.battleResFrame and not CellDB["tools"]["battleResTimer"][2] and CellDB["general"]["menuPosition"] == "top_bottom" then
@@ -242,25 +244,35 @@ menuFrame.fadeOut:SetScript("OnFinished", function()
     fadedIn = false
     fadedOut = true
     menuFrame:SetAlpha(0)
-
-    if hoverFrame:IsMouseOver() then
-        menuFrame.fadeIn:Play()
-    end
+    menuFrame:Hide()
 end)
 
-hoverFrame:SetScript("OnEnter", function()
-    if not CellDB["general"]["fadeOut"] then return end
-    if not (fadingIn or fadedIn) then
-        menuFrame.fadeIn:Play()
-    end
-end)
-hoverFrame:SetScript("OnLeave", function()
-    if not CellDB["general"]["fadeOut"] then return end
-    if hoverFrame:IsMouseOver() then return end
-    if not (fadingOut or fadedOut) then
-        menuFrame.fadeOut:Play()
-    end
-end)
+if Cell.is335 then
+    hoverFrame:SetScript("OnEnter", function()
+        if not CellDB["general"]["fadeOut"] then return end
+        menuFrame:Show()
+        menuFrame:SetAlpha(1)
+    end)
+    hoverFrame:SetScript("OnLeave", function()
+        if not CellDB["general"]["fadeOut"] then return end
+        if hoverFrame:IsMouseOver() then return end
+        menuFrame:Hide()
+    end)
+else
+    hoverFrame:SetScript("OnEnter", function()
+        if not CellDB["general"]["fadeOut"] then return end
+        if not (fadingIn or fadedIn) then
+            menuFrame.fadeIn:Play()
+        end
+    end)
+    hoverFrame:SetScript("OnLeave", function()
+        if not CellDB["general"]["fadeOut"] then return end
+        if hoverFrame:IsMouseOver() then return end
+        if not (fadingOut or fadedOut) then
+            menuFrame.fadeOut:Play()
+        end
+    end)
+end
 
 local function UpdateHoverFrame()
     local anchor = Cell.vars.currentLayoutTable["main"]["anchor"]
@@ -486,7 +498,11 @@ local function UpdateMenu(which)
 
     if not which or which == "fadeOut" then
         if CellDB["general"]["fadeOut"] then
-            menuFrame.fadeOut:Play()
+            if Cell.is335 then
+                menuFrame:Hide()
+            else
+                menuFrame.fadeOut:Play()
+            end
             -- local totalElapsed = 0
             -- menuFrame:SetScript("OnUpdate", function(self, elapsed)
             --     totalElapsed = totalElapsed + elapsed
@@ -504,7 +520,9 @@ local function UpdateMenu(which)
             --     end
             -- end)
         else
-            menuFrame.fadeIn:Play()
+            menuFrame:Show()
+            menuFrame:SetAlpha(1)
+            if not Cell.is335 then menuFrame.fadeIn:Play() end
             -- menuFrame:SetScript("OnUpdate", nil)
         end
     end
